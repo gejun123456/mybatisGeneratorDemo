@@ -8,4 +8,4 @@ execute the script in src/main/resource/sqlScript.sql
 
 config project location in mybatisGenerator.xml
 
-than run App.java
+than run MybatisGeneratorMain.java  to generate the mybatis

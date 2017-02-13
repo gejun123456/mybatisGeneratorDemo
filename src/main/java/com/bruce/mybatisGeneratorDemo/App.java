@@ -1,35 +1,54 @@
 package com.bruce.mybatisGeneratorDemo;
 
-import org.mybatis.generator.api.MyBatisGenerator;
-import org.mybatis.generator.config.Configuration;
-import org.mybatis.generator.config.xml.ConfigurationParser;
-import org.mybatis.generator.exception.InvalidConfigurationException;
-import org.mybatis.generator.exception.XMLParserException;
-import org.mybatis.generator.internal.DefaultShellCallback;
+import com.alibaba.druid.pool.DruidDataSource;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.io.File;
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
+import javax.sql.DataSource;
 
 /**
- * @Author bruce.ge
- * @Date 2017/2/13
- * @Description
+ * Created by bruce.ge on 2017/2/13.
  */
+@EnableAutoConfiguration
+@Configuration
+@ComponentScan
 public class App {
-    public static void main(String[] args) throws InterruptedException, SQLException, IOException, XMLParserException, InvalidConfigurationException {
-        List<String> warnings = new ArrayList<String>();
-        boolean overwrite = true;
-        File configFile = new File("mybatisGenerator.xml");
-        ConfigurationParser cp = new ConfigurationParser(warnings);
-        Configuration config = cp.parseConfiguration(configFile);
-        DefaultShellCallback callback = new DefaultShellCallback(overwrite);
-        MyBatisGenerator myBatisGenerator = new MyBatisGenerator(config, callback, warnings);
-        myBatisGenerator.generate(null);
-        for (String warning : warnings) {
-            System.out.println(warning);
-        }
+    @Value("${db.url}")
+    private String dbUrl;
+
+
+    @Value("${db.username}")
+    private String dbUserName;
+
+
+    @Value("${db.password}")
+    private String dbPassword;
+
+
+    @RequestMapping("/")
+    String home() {
+        return "hello world";
     }
+
+    public static void main(String[] args) {
+
+        SpringApplication.run(App.class, args);
+    }
+
+
+    @Bean(initMethod = "init")
+    public DataSource dataSource() {
+        DruidDataSource source = new DruidDataSource();
+        source.setUsername(dbUserName);
+        source.setPassword(dbPassword);
+        source.setUrl(dbUrl);
+        return source;
+    }
+
 }
